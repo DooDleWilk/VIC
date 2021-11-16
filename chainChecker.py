@@ -2,7 +2,22 @@ import os
 import sys
 
 args = sys.argv
-image_dir = args[1]
+
+autoFix = False
+image_dir = None
+
+for arg in args:
+    if '--path=' in str(arg):
+        image_dir = str(arg).split('--path=')[1]
+    elif '--fix' in str(arg):
+        autoFix = True
+    elif arg != args[0]:
+        print('Error parsing argument:', str(arg))
+        exit()
+
+if image_dir is None:
+    print('Missing required PATH using --path=')
+    exit()
 
 # ----------------------------------------------------------
 
@@ -168,6 +183,12 @@ for imageLayerChild in imageLayers:
 
 print('--- Checking for Dangling chains ---')
 
+scratchLayer = None
+for imageLayer in imageLayers:
+    if imageLayer.getId() == 'scratch':
+        scratchLayer = imageLayer
+        break
+
 # Checking for dangling layers
 for chain in chains:
     if chain[-1].getId() != 'scratch':
@@ -175,3 +196,23 @@ for chain in chains:
         for layer in chain:
             print(' - layer', layer.getId())
         print('---')
+        if autoFix == True:
+            # Fixing dangling layer
+            danglingLayer = chain[-1]
+            print('FIXING Layer', danglingLayer.getId(), 'to point back to scratch Layer...')
+            vmxFilePath = image_dir + '/' + danglingLayer.getId() + '/' + danglingLayer.getId() + '.vmdk'
+            with open(vmxFilePath, 'r') as file:
+                fileLines = file.readlines()
+
+            newFileLines = []
+            for fileLine in fileLines:
+                if 'parentCID=' in str(fileLine):
+                    fileLine = 'parentCID=' + str(scratchLayer.getMetadataVMDK().getCID()) + '\n'
+                elif 'parentFileNameHint=' in str(fileLine):
+                    fileLine = 'parentFileNameHint="' + image_dir + 'scratch.vmdk"\n'
+                newFileLines.append(fileLine)
+
+            print(newFileLines)
+
+            with open(vmxFilePath, 'w') as file:
+                file.writelines(newFileLines)
