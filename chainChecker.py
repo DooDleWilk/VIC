@@ -209,7 +209,7 @@ for chain in chains:
                 if 'parentCID=' in str(fileLine):
                     fileLine = 'parentCID=' + str(scratchLayer.getMetadataVMDK().getCID()) + '\n'
                 elif 'parentFileNameHint=' in str(fileLine):
-                    fileLine = 'parentFileNameHint="' + image_dir + 'scratch.vmdk"\n'
+                    fileLine = 'parentFileNameHint="' + image_dir + '/scratch/scratch.vmdk"\n'
                 newFileLines.append(fileLine)
 
             print(newFileLines)
