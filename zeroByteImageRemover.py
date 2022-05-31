@@ -146,7 +146,7 @@ for project in projects:
 
                 if autoFix == True:
                     if isHarborRunning == False:
-                        folderToDelete = dataRepositoriesPath + project.getName() + '/' + projectImage.getName() + '/_manifests/tags/' + projectImage.getTag()
+                        folderToDelete = projectImage.getName() + '/_manifests/tags/' + projectImage.getTag()
                         print('Deleting Folder: ' + folderToDelete)
                         for root, dirs, files in os.walk(folderToDelete, topdown=False):
                             for name in files:
