@@ -90,34 +90,39 @@ for dir in os.listdir(dataRepositoriesPath):
     if os.path.isdir(os.path.join(dataRepositoriesPath, dir)):
         project = Project(dir)
 
+        imagePaths = []
+
         # List all IMAGES in that PROJECT
-        for imageDir in os.listdir(dataRepositoriesPath + dir):
-            if os.path.isdir(os.path.join(dataRepositoriesPath + dir, imageDir)):
-                imagePath = dataRepositoriesPath + dir + '/' + imageDir
+        for dirpath, dirs, files in os.walk(os.path.join(dataRepositoriesPath, dir)):
+            if '/_' in dirpath:
+                imagePath = dirpath.split('/_')[0]
+                if imagePath not in imagePaths:
+                    imagePaths.append(imagePath)
 
-                # List all TAGS per IMAGE in that PROJECT
-                for imageTagDir in os.listdir(imagePath + '/_manifests/tags/'):
-                    if os.path.isdir(os.path.join(imagePath + '/_manifests/tags/', imageTagDir)):
-                        imageTagPath = imagePath + '/_manifests/tags/' + imageTagDir
-                        image = Image(imageDir)
+        for imagePath in imagePaths:
+            # List all TAGS per IMAGE in that PROJECT
+            for imageTagDir in os.listdir(imagePath + '/_manifests/tags/'):
+                if os.path.isdir(os.path.join(imagePath + '/_manifests/tags/', imageTagDir)):
+                    imageTagPath = imagePath + '/_manifests/tags/' + imageTagDir
+                    image = Image(imagePath)
 
-                        image.setTag(imageTagDir)
+                    image.setTag(imageTagDir)
 
-                        # Check that the /current/link file exists
-                        if os.path.exists(imageTagPath + '/current/link'):
-                            image.setCurrentLinkFilePath(imageTagPath + '/current/link')
+                    # Check that the /current/link file exists
+                    if os.path.exists(imageTagPath + '/current/link'):
+                        image.setCurrentLinkFilePath(imageTagPath + '/current/link')
 
-                            with open(image.getCurrentLinkFilePath(), 'rb') as f:
-                                lines = f.readlines()
-                                digest = lines[0].replace('sha256:', '', 1)
-                                digest = digest.replace('\n', '', 1)
-                                image.setDigest(digest)
+                        with open(image.getCurrentLinkFilePath(), 'rb') as f:
+                            lines = f.readlines()
+                            digest = lines[0].replace('sha256:', '', 1)
+                            digest = digest.replace('\n', '', 1)
+                            image.setDigest(digest)
 
-                            # Check that the BLOB file /data exists
-                            if os.path.exists(dataBlobsPath + image.getDigest()[0:2] + '/' + image.getDigest() + '/data'):
-                                image.setBlobFileExists(True)
+                        # Check that the BLOB file /data exists
+                        if os.path.exists(dataBlobsPath + image.getDigest()[0:2] + '/' + image.getDigest() + '/data'):
+                            image.setBlobFileExists(True)
 
-                        project.addImage(image)
+                    project.addImage(image)
 
         projects.append(project)
 
