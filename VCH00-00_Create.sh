@@ -10,7 +10,7 @@
 --public-network-gateway 192.168.100.254 \
 --dns-server 192.168.0.10 \
 --container-network Container-Net_192.168.120.0:Net-120 \
---container-network-gateway Container-Net_192.168.120.0:192.168.123.254/24 \
+--container-network-gateway Container-Net_192.168.120.0:192.168.120.254/24 \
 --container-network-ip-range Container-Net_192.168.120.0:192.168.120.0/24 \
 --container-network-dns Container-Net_192.168.120.0:192.168.0.10 \
 --container-network-firewall Container-Net_192.168.120.0:open \
