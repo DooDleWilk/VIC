@@ -5,10 +5,10 @@ from tools import cli, tasks, service_instance
 
 
 def isVCH(virtual_machine):
-    if "Photon - VCH" in virtual_machine.summary.config.guestFullName:
-        return True
-    else:
-        return False
+    if virtual_machine.summary.config.guestFullName is not None:
+        if "Photon - VCH" in virtual_machine.summary.config.guestFullName:
+            return True
+    return False
 
 
 def getHardDiskAmount(vm):
