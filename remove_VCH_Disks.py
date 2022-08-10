@@ -55,23 +55,39 @@ def main():
     VCH_List = []
 
     try:
+        # First gathering of the inventory for Cluster list population
         content = si.RetrieveContent()
 
-        container = content.rootFolder  # starting point to look into
-        view_type = [vim.VirtualMachine]  # object types to look for
-        recursive = True  # whether we should look into it recursively
-        container_view = content.viewManager.CreateContainerView(
-            container, view_type, recursive)
+        children = content.rootFolder.childEntity
+        for child in children:  # Iterate though DataCenters
+            datacenter = child
+            clusters = datacenter.hostFolder.childEntity
+            for cluster in clusters:  # Iterate through the clusters in the DC
+                print("Listing Clusters...")
+                Cluster_List.append(cluster)
 
-        children = container_view.view
+        # For each Cluster, we refresh the view of the inventory, which might have changed...
+        for cluster_in_list in Cluster_List:
+            content = si.RetrieveContent()
 
-        print("Listing VCHs with at least one Disk attached...")
-        for child in children:
-            if isVCH(child):
-                for dev in child.config.hardware.device:
-                    if isinstance(dev, vim.vm.device.VirtualDisk) and "Hard disk " in dev.deviceInfo.label:
-                        VCH_List.append(child)
-                        break
+            children = content.rootFolder.childEntity
+            for child in children:  # Iterate though DataCenters
+                datacenter = child
+                clusters = datacenter.hostFolder.childEntity
+                for cluster in clusters:  # Iterate through the clusters in the DC
+                    if cluster == cluster_in_list:
+                        print("-- Cluster:", cluster.name)
+                        print("Listing VCHs with at least one Disk attached...")
+                        hosts = cluster.host  # Variable to make pep8 compliance
+                        for host in hosts:  # Iterate through Hosts in the Cluster
+                            hostname = host.summary.config.name
+                            vms = host.vm
+                            for vm in vms:  # Iterate through each VM on the host
+                                if isVCH(vm):
+                                    for dev in vm.config.hardware.device:
+                                        if isinstance(dev, vim.vm.device.VirtualDisk) and "Hard disk " in dev.deviceInfo.label:
+                                            VCH_List.append(vm)
+                                            break
 
     except vmodl.MethodFault as error:
         print("Caught vmodl fault : " + error.msg)
