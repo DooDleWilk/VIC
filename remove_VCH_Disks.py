@@ -52,6 +52,7 @@ def main():
     args = parser.get_args()
     si = service_instance.connect(args)
 
+    Cluster_List = []
     VCH_List = []
 
     try:
