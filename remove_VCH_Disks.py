@@ -48,6 +48,7 @@ def detach_disk_from_vm(vm, disk_number):
 def main():
 
     parser = cli.Parser()
+    parser.add_custom_argument('--datacenter', required=False, help='Scan only this Datacenter')
     parser.add_custom_argument('--fix', required=False, help='Automatically detach Hard Disk(s).')
     args = parser.get_args()
     si = service_instance.connect(args)
@@ -62,6 +63,9 @@ def main():
         children = content.rootFolder.childEntity
         for child in children:  # Iterate though DataCenters
             datacenter = child
+            if args.datacenter is not None and datacenter.name.upper() != args.datacenter.upper():
+                continue
+
             clusters = datacenter.hostFolder.childEntity
             for cluster in clusters:  # Iterate through the clusters in the DC
                 print("Listing Clusters...")
@@ -74,6 +78,9 @@ def main():
             children = content.rootFolder.childEntity
             for child in children:  # Iterate though DataCenters
                 datacenter = child
+                if args.datacenter is not None and datacenter.name.upper() != args.datacenter.upper():
+                    continue
+
                 clusters = datacenter.hostFolder.childEntity
                 for cluster in clusters:  # Iterate through the clusters in the DC
                     if cluster == cluster_in_list:
