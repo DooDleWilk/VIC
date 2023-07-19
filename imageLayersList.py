@@ -92,19 +92,6 @@ class MetadataVMDK:
 
 imageLayers = []
 
-if image_layer_name is not None:
-    print('-------------------------------')
-    print('- CHECKING VCH K/V ACCESS     -')
-    print('-------------------------------')
-
-    try:
-        apiKV_fullpath = vch_dir + 'kvStores/apiKV.dat'
-        # Open file
-        json_file = open(apiKV_fullpath, 'r')
-    except:
-        print('Error opening', vch_dir)
-        exit()
-
 print('-------------------------------')
 print('- CHECKING FILES STRUCTURE    -')
 print('-------------------------------')
