@@ -185,8 +185,11 @@ print('-------------------------------')
 for imageLayerParent in imageLayers:
     counterImageLayerChild = 0
     for imageLayerChild in imageLayers:
-        if imageLayerChild.getMetadataVMDK().getParentCID() == imageLayerParent.getMetadataVMDK().getCID():
-            counterImageLayerChild = counterImageLayerChild + 1
+        if imageLayerChild.getMetadataVMDK().getParentCID() == None:
+            print('--- Image Layer Child ParentCID is NULL for {} ---'.format(image_dir + '/' + imageLayerChild.getId()))
+        else:
+            if imageLayerChild.getMetadataVMDK().getParentCID() == imageLayerParent.getMetadataVMDK().getCID():
+                counterImageLayerChild = counterImageLayerChild + 1
     imageLayerParent.setChildAmount(counterImageLayerChild)
 
 # Building Chains, starting from the end
@@ -200,11 +203,14 @@ for imageLayerChild in imageLayers:
         while True:
             foundParentLayer = False
             for imageLayerParent in imageLayers:
-                if searchingLayer.getMetadataVMDK().getParentCID() == imageLayerParent.getMetadataVMDK().getCID():
-                    chain.append(imageLayerParent)
-                    searchingLayer = imageLayerParent
-                    foundParentLayer = True
-                    break
+                if imageLayerChild.getMetadataVMDK().getParentCID() == None:
+                    print('--- Image Layer Child ParentCID is NULL for {} ---'.format(image_dir + '/' + imageLayerChild.getId()))
+                else:
+                    if searchingLayer.getMetadataVMDK().getParentCID() == imageLayerParent.getMetadataVMDK().getCID():
+                        chain.append(imageLayerParent)
+                        searchingLayer = imageLayerParent
+                        foundParentLayer = True
+                        break
             if foundParentLayer == False:
                 break
         chains.append(chain)
